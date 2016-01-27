@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+	<div class="wrapper">
+        <h2>Event Detail</h2>
+		<div class="event-info am-g">
+			<div class="event-img clearfix am-u-sm-10 am-u-sm-centered am-u-md-5 am-u-md-uncentered">
+                {% if event.image_url %}
+                    <img class="am-img-thumbnail am-radius" src="{{ MEDIA_URL }}{{ event.image_url }}">
+                {% else %}
+                    <img class="am-img-thumbnail am-radius" src="{{ MEDIA_URL }}events/default_event.png">
+                {% endif %}
+			</div>
+			<div class="event-brief-info am-u-sm-10 am-u-sm-centered am-u-md-5 am-u-md-uncentered">
+				<ul class="am-avg-sm-1">
+					<li class="am-text-truncate">
+                        <span class="am-icon-navicon am-icon-fw"></span> {{ event.title }}
+                    </li>
+                    <li class="am-text-truncate">
+                        <span class="am-icon-user am-icon-fw"></span> {{ event.organizer }}
+                    </li>
+                    <li class="am-text-truncate">
+                        {% if event.event_endtime %}
+                            <span class="am-icon-clock-o am-icon-fw"></span> {{ event.event_date }} - {{ event.event_endtime }}
+                        {% else %}
+                            <span class="am-icon-clock-o am-icon-fw"></span> {{ event.event_date }}
+                        {% endif %}
+                    </li>
+                    <li class="am-text-truncate">
+                        {% if event.location_text %}
+                            <span class="am-icon-map-marker am-icon-fw"></span> {{ event.location_text }} ({{ event.address }})
+                        {% else %}
+                            <span class="am-icon-map-marker am-icon-fw"></span> {{ event.address }}
+                        {% endif %}
+                    </li>
+                    <li>
+                        <span class="am-icon-tags am-icon-fw"></span> {{ event.get_event_type }}
+                    </li>
+                    <li>
+                        <ul class="am-avg-sm-2">
+                            <li>
+                                <span class="am-icon-users am-icon-fw"></span> {{ event.get_reg_count }} going
+                            </li>
+                            <li>
+                                {% if user.id in event.get_reg_user_ids %}
+                                    <a class="am-btn am-btn-danger am-btn-xs cancel-register-btn" data-id="{{ event.event_id }}">Cancel Register</a>
+                                {% else %}
+                                    <a class="am-btn am-btn-primary am-btn-xs register-btn" data-id="{{ event.event_id }}">Register</a>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </li>
+				</ul>
+			</div>
+		</div>
+        <hr>
+        <article class="am-article event-description">
+            <div class="am-article-bd">
+                <h3>Description</h3>
+                <p>{{ event.description }}</p>
+            </div>
+        </article>
+        {% if event.latitude and event.longitude %}
+		<hr>
+        <article class="am-article event-location">
+            <div class="am-article-bd">
+                <h3>Location</h3>
+                <p>	<div id="map" style="height: 300px; width: 100%"></div></p>
+            </div>
+        </article>
+        {% endif %}
+        {% if is_creator and registered_users %}
+        <hr>
+        <article class="am-article event-attendees">
+            <div class="am-article-bd">
+                <h3>Registered Attendees</h3>
+                <ul>
+                {% for user in registered_users %}
+                    <li>{{ user.username}}</li>
+                {% endfor %}
+                </ul>
+            </div>
+        </article>
+        {% endif %}      
+	</div>
+    <div class="am-modal" tabindex="-1" id="cancel-register-modal">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd">
+                <span class="am-icon-warning">Cancel Registration</span>
+            </div>
+            <div class="am-modal-bd">
+                Are you gonna cancel this registration?
+            </div>
+            <div class="am-modal-footer">
+                <span class="am-modal-btn" data-am-modal-cancel>No</span>
+                <span class="am-modal-btn" data-am-modal-confirm>Yes</span>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    {% if event.latitude and event.longitude %}
+        <script type="text/javascript">
+        var map;
+        function initMap() {
+            loc = {lat: {{ event.latitude }}, lng: {{ event.longitude }}};
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: loc,
+                zoom: 8
+            });
+
+            var marker = new google.maps.Marker({
+            position: loc,
+            map: map
+          });
+        }
+        </script>
+        <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+    {% endif %}
+
+    <script type="text/javascript">
+        $(function() {
+            $('.register-btn').on('click', function () {
+                var event_id = $(this).attr('data-id');
+                var register_url ="{% url 'ffx:event_register' 999 %}".replace (999, event_id);
+                var signin_url = "{% url 'ffx:signin' %}";
+                $.ajax({
+                    url: register_url,
+                    type: 'GET',
+                    dataType: 'JSON',
+                    success: function (data) {
+                        var return_code = data.return_code;
+                        if (return_code == 0) {
+                            window.location.reload();
+                        }
+                        else if(return_code == 100){
+                            window.location.replace(signin_url)
+                        }
+                        else {
+                            alert(data.return_desc);
+                        }
+                    },
+                    error: function(xhr,errmsg,err) {
+                        console.log(xhr.status + ": " + xhr.responseText);
+                    }
+                });
+            });
+
+            $('.cancel-register-btn').on('click', function() {
+                $('#cancel-register-modal').modal({
+                relatedTarget: this,
+                onConfirm: function() {
+                    var event_id = $(this.relatedTarget).data('id');
+                    var cancel_register_url = "{% url 'ffx:event_cancel_register' 999 %}".replace (999, event_id);
+                    var signin_url = "{% url 'ffx:signin' %}";
+                    $.ajax({
+                        url: cancel_register_url,
+                        type: 'GET',
+                        dataType: 'JSON',
+                        success: function (data) {
+                            var return_code = data.return_code;
+                            if (return_code == 0) {
+                                window.location.reload();
+                            }
+                            else if (return_code == 100) {
+                                window.location.replace(signin_url)
+                            }
+                            else {
+                                alert(data.return_desc);
+                            }
+                        },
+                        error: function (xhr, errmsg, err) {
+                            console.log(xhr.status + ": " + xhr.responseText);
+                        }
+                    })
+                },
+                // closeOnConfirm: false,
+                onCancel: function() {
+                }
+            })
+            });
+        });
+    </script>
+{% endblock %}

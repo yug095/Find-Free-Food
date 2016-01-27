@@ -1,0 +1,58 @@
+{% load endless %}
+{% paginate events %}
+{% for event in events %}
+    <li class="event-item">
+        <div class="event-img clearfix">
+            <a href="{% url 'ffx:event_detail' event.event_id %}">
+                {% if event.image_url %}
+                    <img class="am-img-thumbnail am-radius list-img" src="{{ MEDIA_URL }}{{ event.image_url }}">
+                {% else %}
+                    <img class="am-img-thumbnail am-radius list-img" src="{{ MEDIA_URL }}events/default_event.png">
+                {% endif %}
+            </a>
+        </div>
+        <div class="event-brief-info">
+            <ul class="am-avg-sm-1">
+                <li class="am-text-truncate">
+                    <span class="am-icon-navicon am-icon-fw"></span> <a href="{% url 'ffx:event_detail' event.event_id %}">{{ event.title }}</a>
+                </li>
+                <li class="am-text-truncate">
+                    <span class="am-icon-user am-icon-fw"></span> {{ event.organizer }}
+                </li>
+                <li class="am-text-truncate">
+                    {% if event.event_endtime %}
+                        <span class="am-icon-clock-o am-icon-fw"></span> {{ event.event_date }} - {{ event.event_endtime }}
+                    {% else %}
+                        <span class="am-icon-clock-o am-icon-fw"></span> {{ event.event_date }}
+                    {% endif %}
+                </li>
+                <li class="am-text-truncate">
+                    {% if event.location_text %}
+                        <span class="am-icon-map-marker am-icon-fw"></span> {{ event.location_text }} ({{ event.address }})
+                    {% else %}
+                        <span class="am-icon-map-marker am-icon-fw"></span> {{ event.address }}
+                    {% endif %}
+                </li>
+
+            </ul>
+            <ul class="am-avg-sm-1">
+                <li>
+                    <span class="am-icon-tags am-icon-fw"></span> {{ event.get_event_type }}
+                </li>
+            </ul>
+            <ul class="am-avg-sm-2">
+                <li>
+                    <span class="am-icon-users am-icon-fw"></span> {{ event.get_reg_count }} going
+                </li>
+                <li>
+                    {% if user.id in event.get_reg_user_ids %}
+                        <a class="am-btn am-btn-danger am-btn-xs cancel-register-btn" data-id="{{ event.event_id }}">Cancel Register</a>
+                    {% else %}
+                        <a class="am-btn am-btn-primary am-btn-xs register-btn" data-id="{{ event.event_id }}">Register</a>
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </li>
+{% endfor %}
+{% show_more %}

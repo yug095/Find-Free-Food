@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+
+<div style="text-align: center;">
+  <div class="am-g">
+    <h1 style="font-size: 200%; margin-top: 20px; margin-bottom: 0px;">FFX</h1>
+    <p style="margin-top: 0px;">Find Free X<br/>Feed Yourself Best Oppotunities!</p>
+  </div>
+</div>
+
+
+
+<div class="am-g">
+  <div class="am-u-lg-6 am-u-md-6 am-u-sm-10 am-u-sm-centered">
+    <h2>Sign In</h2>
+    <hr>
+    <form method="post" class="am-form">
+      {% csrf_token %}
+      {% if error %}
+        <div>{{ error }}</div>
+      {% endif %}
+      <label for="username">Username:</label>
+      <input type="text" name="username" id="username" value="">
+      <br>
+      <label for="password">Password:</label>
+      <input type="password" name="password" id="password" value="">
+      <br />
+      <div class="am-cf">
+        <input type="submit" value="Sign In" class="am-btn am-btn-primary am-btn-sm am-fl">
+      </div>
+      {% csrf_token %}
+    </form>
+    <hr>
+  </div>
+</div>
+
+{% endblock %}

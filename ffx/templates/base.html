@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+  <meta charset="UTF-8">
+  <title>FFX | Find Free X</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp"/>
+  {% load staticfiles %}
+  <link rel="alternate icon" type="image/png" href="{% static 'img/logo.png' %}">
+  <link rel="stylesheet" href="{% static 'css/amazeui.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  {% block style %}
+  {% endblock %}
+</head>
+
+<body>
+<header class="am-topbar am-topbar-fixed-top am-topbar-inverse">
+  <div class="am-container">
+    <h1 class="am-topbar-brand">
+      <a href="{% url 'ffx:event_index' %}" style="color: #fff;">FFX</a>
+    </h1>
+
+    <button class="am-topbar-btn am-topbar-toggle am-btn am-btn-sm am-btn-success am-show-sm-only" data-am-collapse="{target: '#collapse-head'}">
+      <span class="am-sr-only"></span>
+      <span class="am-icon-bars"></span>
+    </button>
+    <div class="am-collapse am-topbar-collapse" id="collapse-head">
+      {% if user.is_authenticated %}
+        <div class="am-topbar-right">
+          <a href="{% url 'ffx:signout' %}"><button class="am-btn am-btn-secondary am-topbar-btn am-btn-sm"><span class="am-icon-pencil"></span> Sign out</button></a>
+        </div>
+        <div class="am-topbar-right">
+           <ul class="am-nav am-nav-pills am-topbar-nav">
+             <li><a style="color:#fff;"><b>WELCOME {{ user.username }}</b></a></li>
+             <li><a href="{% url 'ffx:myinfo' %}?type=to_attend" style="color:#fff;"><b>MY INFO</b></a></li>
+             {% if is_organizer %}
+              <li><a href="{% url 'ffx:event_create' %}" style="color:#fff;"><b>CREATE EVENT</b></a></li>
+             {% endif %}
+            </ul>
+         </div>
+       {% else %}
+         <div class="am-topbar-right">
+           <a href="{% url 'ffx:signup' %}"><button class="am-btn am-btn-secondary am-topbar-btn am-btn-sm"><span class="am-icon-pencil"></span> Sign Up</button></a>
+         </div>
+         <div class="am-topbar-right">
+           <a href="{% url 'ffx:signin' %}"><button class="am-btn am-btn-primary am-topbar-btn am-btn-sm"><span class="am-icon-user"></span> Sign In</button></a>
+         </div>
+       {% endif %}
+    </div>
+  </div>
+</header>
+
+<div class="am-container content">
+  {% block content %}
+  {% endblock %}
+</div>
+
+<footer class="footer">
+  <p>&copy; 2015 FFX Team</p>
+</footer>
+
+
+<script src="{% static 'js/jquery.min.js' %}"></script>
+<script src="{% static 'js/amazeui.min.js' %}"></script>
+{% block js %}
+{% endblock %}
+
+</body>
+</html>

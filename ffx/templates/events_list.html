@@ -1,0 +1,22 @@
+{% if events %}
+    <div class="am-g">
+        <ul class="event-list" id="event-list">
+            {% include page_template %}
+        </ul>
+    </div>
+{% endif %}
+
+<div class="am-modal" tabindex="-1" id="cancel-register-modal">
+    <div class="am-modal-dialog">
+        <div class="am-modal-hd">
+            <span class="am-icon-warning">Cancel Registration</span>
+        </div>
+        <div class="am-modal-bd">
+            Are you gonna cancel this registration?
+        </div>
+        <div class="am-modal-footer">
+            <span class="am-modal-btn" data-am-modal-cancel>No</span>
+            <span class="am-modal-btn" data-am-modal-confirm>Yes</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% load staticfiles %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/amazeui.datetimepicker.css' %}">
+{% endblock %}
+
+{% block content %}
+<div style="text-align: center; margin-bottom:20px;">
+  <div class="am-g">
+    <h1 style="font-size: 200%; margin-top: 20px; margin-bottom: 0px;">Start an Event NOW</h1>
+  </div>
+</div>
+
+<div class="container" style="margin-bottom: 10px;">
+  <form method="post" class="am-form am-form-horizontal" enctype="multipart/form-data" name="eventform" onsubmit="validateform();">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="am-u-md-7 am-u-sm-12">
+        <div class="am-form-group">
+          <label for="title" class="am-u-sm-4 am-form-label">Title</label>
+          <div class="am-u-sm-8">
+            <input type="text" name="title" id="title" value="{{ form.title.value|default_if_none:"" }}">
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.title.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="my-datetimepicker" class="am-u-sm-4 am-form-label">Date</label>
+          <div class="am-u-sm-8 am-form-icon">
+            <span class="am-icon-calendar" style="margin-left: 13px;"></span>
+              <input type="text" id="my-datetimepicker" name="event_date" class="form-datetime am-form-field" value="{{ form.event_date.value|default_if_none:"" }}" readonly>
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.event_date.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="my-end-datetimepicker" class="am-u-sm-4 am-form-label">End Time</label>
+          <div class="am-u-sm-8 am-form-icon">
+            <span class="am-icon-clock-o" style="margin-left: 13px;"></span>
+              <input type="text" id="my-end-datetimepicker" name="event_endtime" class="am-form-field" value="{{ form.event_endtime.value|default_if_none:"" }}" readonly>
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.event_endtime.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="event_type" class="am-u-sm-4 am-form-label">Type</label>
+          <div class="am-u-sm-8" style="margin-top: 10px;">
+              <ul class="am-avg-md-2">
+              {% if event_types %}
+                  {% for event_type in event_types %}
+                    <li>
+                      <input type="checkbox" id="event_type" name="event_type" value="{{ event_type.id }}"> {{ event_type }}
+                    </li>
+                  {% endfor %}
+              {% endif %}
+              </ul>
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.event_type.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="capacity" class="am-u-sm-4 am-form-label">Capacity</label>
+          <div class="am-u-sm-8">
+            <input type="text" id="capacity" name="capacity" value="{{ form.capacity.value|default:"" }}">
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.capacity.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="capacity" class="am-u-sm-4 am-form-label">Requires major</label>
+          <div class="am-u-sm-8">
+            <input type="text" id="requires_major" name="requires_major" value="{{ form.requires_major.value|default:"" }}">
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.requires_major.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="am-form-group">
+          <label for="id_address" class="am-u-sm-4 am-form-label">Address</label>
+          <div class="am-u-sm-8">
+            <input type="text" id="id_address" name="address" value="{{ form.address.value|default_if_none:"" }}">
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.address.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="location_text" class="am-u-sm-4 am-form-label">Location info</label>
+          <div class="am-u-sm-8">
+            <input type="text" id="location_text" name="location_text" value="{{ form.location_text.value|default_if_none:"" }}">
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.location_text.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+        <div class="am-form-group">
+          <label for="map_marker" class="am-u-sm-4 am-form-label">Map</label>
+          <div class="am-u-sm-8">
+            {{ form.map_marker }}
+          </div>
+          <div class="am-u-sm-8">
+            {% for error in form.map_marker.errors %}
+              {{ error }}
+            {% endfor %}
+          </div>
+        </div>
+    </div>
+
+    <div class="am-u-md-5 am-u-sm-12">
+      <img src="{% static 'img/pleaseupload.png' %}" id="uploadedpic" class="am-img-responsive am-img-thumbnail" alt=""/>
+      <div class="am-form-group am-form-file" style="margin-top:20px;">
+          <label for="photo">Event Photo Upload</label>
+          <div>
+            <button type="button" class="am-btn am-btn-default am-btn-sm">
+              <i class="am-icon-cloud-upload"></i> Please Choose Your File</button>
+          </div>
+          <input type="file" id="photo" name="image_url" accept="image/*" onchange="loadFile(event)">
+      </div>
+    </div>
+
+    <div class="am-form-group am-align-left am-u-sm-12 am-u-md-12">
+        <label for="desc" class="am-u-md-2 am-u-sm-12 am-form-label">Description</label>
+        <div class="am-u-md-10 am-u-sm-12">
+          <textarea class="" rows="5" id="desc" name="description"></textarea>
+        </div>
+        <div class="am-u-md-10 am-u-sm-12">
+          {% for error in form.description.errors %}
+            {{ error }}
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="am-form-group am-align-left am-u-sm-12 am-u-md-12">
+        <input type="submit" value="Create Event" class="create-event-btn am-btn am-btn-primary am-btn-sm">
+      </div>
+
+  </form>
+</div>
+<div class="datepicker-mask"></div>
+<div class="end-datepicker-mask"></div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/amazeui.datetimepicker.js' %}"></script>
+    <script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript" src="/static/location_field/js/jquery.livequery.js"></script>
+    <script type="text/javascript" src="/static/location_field/js/form.js"></script>
+
+    <script type="text/javascript">
+        $(function() {
+            // Analyzing today's date
+            var today = new Date(),
+                yyyy = today.getFullYear(),
+                mm = today.getMonth() + 1,
+                dd = today.getDate(),
+                time = yyyy + '-' + mm + '-' + dd;
+
+            $('#my-datetimepicker').datetimepicker({
+                language:  'en-US',
+                format: 'yyyy-mm-dd hh:ii',
+                startDate: time,
+                autoclose: true,
+                minuteStep: 15
+            }).on('show', function(){
+                $('.datepicker-mask').show();
+            }).on('hide', function(){
+                $('.datepicker-mask').hide();
+            });
+
+            $('#my-end-datetimepicker').datetimepicker({
+                language:  'en-US',
+                format: 'hh:ii',
+                startDate: time,
+                autoclose: true,
+                minuteStep: 15,
+                pickTime: false
+            }).on('show', function(){
+                $('.end-datepicker-mask').show();
+            }).on('hide', function(){
+                $('.end-datepicker-mask').hide();
+            });
+
+            $('.datepicker-mask').click(function(){
+                $('.form-datetime').datetimepicker('hide');
+            });
+            $('.end-datepicker-mask').click(function(){
+                $('#my-end-datetimepicker').datetimepicker('hide');
+            });
+        });
+
+    </script>
+
+    <script>
+        var loadFile;
+        loadFile = function (event) {
+            var output = document.getElementById('uploadedpic');
+            output.src = URL.createObjectURL(event.target.files[0]);
+        };
+    </script>
+
+    <script>
+        function validateform() {
+            var str1=document.eventform.event_date.value;
+            var str2=document.eventform.event_endtime.value;
+            var year=str1.substr(0,4);
+            var month=str1.substr(5,2);
+            var day=str1.substr(8,2);
+            var hour1=str1.substr(11,2);
+            var min1=str1.substr(14,2);
+            var hour2=str2.substr(0,2);
+            var min2=str2.substr(3,2);
+            var starttime=new Date(year,month,day,hour1,min1);
+            var endtime=new Date(year,month,day,hour2,min2);
+            console.log(year);
+            console.log(month);
+
+            if (starttime>=endtime) {
+                alert("Start Time Should be Earlier Than End Time!");
+                return false;
+            }
+            else { return true; }
+        }
+    </script>
+{% endblock %}

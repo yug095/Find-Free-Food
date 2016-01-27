@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+    <!-- Latest Events -->
+    {% if latest_events %}
+        <div class="am-g fxx-slider">
+            <div data-am-widget="slider" class="am-slider am-slider-c3 am-u-sm-9 am-u-sm-centered am-u-md-7 am-u-md-centered"
+                 data-am-slider='{&quot;animation&quot;:&quot;slide&quot;,&quot;slideshow&quot;:false}'>
+                <ul class="am-slides">
+                    {% for event in latest_events %}
+                    <li>
+                        {% if event.image_url %}
+                            <img class="am-img-thumbnail am-radius fxx-slider-img" src="{{ MEDIA_URL }}{{ event.image_url }}">
+                        {% else %}
+                            <img class="am-img-thumbnail am-radius fxx-slider-img" src="{{ MEDIA_URL }}events/default_event.png">
+                        {% endif %}
+                        <div class="am-slider-desc">
+                            <a href="{% url 'ffx:event_detail' event.event_id %}"> {{ event.title }} </a>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <p>No events are available.</p>
+    {% endif %}
+    <hr>
+    <!-- Search Area -->
+    <div class="centered">
+        <form action="" class="am-form am-g">
+            <div class="am-form-group am-u-sm-7 am-u-md-4">
+                <!-- Event Type -->
+                <select name="type" class="am-input-sm" data-am-selected>
+                    {% if request.GET.type and request.GET.type == 'all' %}
+                        <option value="all" selected>All</option>
+                    {% else %}
+                        <option value="all">All</option>
+                    {% endif %}
+                    {% if event_types %}
+                        {% for event_type in event_types %}
+                            {% if request.GET.type and request.GET.type == event_type.name %}
+                                <option value="{{ event_type.name }}" selected>{{ event_type.name }}</option>
+                            {% else %}
+                                <option value="{{ event_type.name }}">{{ event_type.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+
+            <!-- Start Date -->
+            <div class="am-form-group am-form-icon am-u-sm-5 am-u-md-3">
+                <span class="am-icon-calendar"></span>
+                <input type="text" class="am-form-field" name="date" id="my-datepicker" value="{{ request.GET.date }}" placeholder="Date" readonly data-am-datepicker/>
+            </div>
+            <div class="am-form-group am-u-sm-6 am-u-md-3">
+                <!--data-am-modal="{target: '#as-prompt'}"-->
+                <button type='button' class="am-btn am-btn-success" id="advanced-search-prompt">Advanced Search</button>
+            </div>
+            <div class="am-form-group am-u-sm-6 am-u-md-2">
+                <button class="am-btn am-btn-success">Search</button>
+            </div>
+        </form>
+    </div>
+    <!-- Event list -->
+    {% include 'events_list.html' %}
+
+    {% if is_organizer %}
+      <div class="am-modal-hd">
+          <a href="{% url 'ffx:event_create' %}"><button class="am-btn am-btn-success am-btn-block">Create New Event</button></a>
+      </div>
+    {% endif %}
+
+    <div class="am-modal am-modal-prompt" tabindex="-1" id="as-prompt">
+        <div class="am-modal-dialog">
+            <div class="am-modal-hd">Advanced Search</div>
+            <div class="am-modal-bd">
+                <select id="type" name="type" data-am-selected class="am-modal-prompt-input">
+                    {% if request.GET.type and request.GET.type == 'all' %}
+                        <option value="all" selected>All</option>
+                    {% else %}
+                        <option value="all">All</option>
+                    {% endif %}
+                    {% if event_types %}
+                        {% for event_type in event_types %}
+                            {% if request.GET.type and request.GET.type == event_type.name %}
+                                <option value="{{ event_type.name }}" selected>{{ event_type.name }}</option>
+                            {% else %}
+                                <option value="{{ event_type.name }}">{{ event_type.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+                <input type="text" class="am-modal-prompt-input" id="date" name="date" value="{{ request.GET.date }}"
+                       readonly placeholder="Date" data-am-datepicker/>
+                <input type="text" class="am-modal-prompt-input" id="title" name="title" value="{{ request.GET.title }}"
+                       placeholder="Title"/>
+                <input type="text" class="am-modal-prompt-input" id="organizer" name="organizer"
+                       value="{{ request.GET.organizer }}" placeholder="Organizer"/>
+            </div>
+            <div class="am-modal-footer">
+                <span class="am-modal-btn" data-am-modal-cancel>Cancel</span>
+                <span class="am-modal-btn" data-am-modal-confirm>Search</span>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <!--<script src="http://code.jquery.com/jquery-latest.js"></script>-->
+    <script src="{% static 'js/endless-pagination.js' %}"></script>
+    <script src="{% static 'js/register.js' %}"></script>
+    <script type="text/javascript">
+        $.endlessPaginate({paginateOnScroll: true});
+        $('#my-datepicker').datepicker({locale: 'en_US'});
+        $('#date').datepicker({locale: 'en_US'});
+
+        var index_url = "{% url 'ffx:event_index' %}";
+        $(function() {
+            $('#advanced-search-prompt').on('click', function() {
+                $('#as-prompt').modal({
+                    relatedTarget: this,
+                    onConfirm: function(e) {
+                        index_url += ('?type=' + e.data[0] + '&date=' + e.data[1] + '&title=' + e.data[2]
+                            + '&organizer=' + e.data[3]);
+                        window.location.replace(index_url);
+                    },
+                    onCancel: function(e) {
+                    }
+                });
+              });
+        });
+
+
+    </script>
+
+{% endblock %}

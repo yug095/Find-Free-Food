@@ -1,0 +1,144 @@
+.content {
+    margin-bottom: 20px;
+}
+
+.fxx-slider {
+    margin-top: 10px;
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.centered {
+    /*margin-top: 10px;*/
+}
+.centered form div {
+    padding-left: 0;
+}
+
+.event-list .event-item{
+	border-bottom: 1px solid #E7E7E7;
+	display: -webkit-flex;
+    display: flex;
+    margin-bottom: 5px;
+}
+.event-list{
+    padding-left: 15px;
+    padding-right: 15px;
+	list-style-type: none;
+}
+
+@mixin event-img-default {
+    position: relative;
+    -webkit-flex: initial;
+    flex: initial;
+    min-width: 50px;
+    overflow: auto;
+}
+
+.event-list .event-item .event-img img{
+    max-width:100%;
+    max-height:100%;
+    position: relative;
+}
+.event-list .event-item .event-brief-info{
+    -webkit-flex: 3;
+    flex: 3;
+    padding-left: 10px;
+}
+
+.advanced-search-form-field {
+    margin-bottom: 5px;
+}
+
+.event-info .event-img {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.event-info .event-img img{
+    max-width:100%;
+    max-height:100%;
+    position: relative;
+}
+
+.event-description {
+    margin-top: 10px;
+}
+
+.wrapper {
+    margin-top: 10px;
+}
+
+.create-event-btn {
+    margin-left: 20px;
+}
+
+footer p {
+      color: #7f8c8d;
+      margin: 0;
+      padding: 15px 0;
+      text-align: center;
+      background: #2d3e50;
+}
+
+
+@media screen and (max-width: 640px) {
+    .fxx-slider-img {
+        height: 160px;
+    }
+    .list-img {
+        height: 98px;
+        width: 160px;
+    }
+    .centered form div .select-width-auto {
+         width: 160px;
+    }
+    .event-list .event-item .event-brief-info ul {
+        font-size: 12px;
+    }
+    .event-list {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .event-list .event-item .event-img {
+        @include event-img-default;
+        width: 160px;
+        height: 120px;
+    }
+    .event-info .event-brief-info {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+@media screen and (min-width: 641px) {
+    .fxx-slider-img {
+        height: 310px;
+    }
+    .list-img {
+        height: 182px;
+        width: 300px;
+    }
+
+    .centered form div {
+        padding-left: 0;
+    }
+    .event-list .event-item .event-img {
+        @include event-img-default;
+        width: 300px;
+        height: 200px;
+    }
+    .event-info .event-brief-info {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 20px;
+    }
+    .event-list .event-item .event-brief-info ul li{
+        margin-bottom: 5px;
+    }
+
+    .event-info .event-brief-info ul li {
+        margin-bottom: 5px;
+    }
+}
